@@ -95,7 +95,7 @@ func (q *QPackEncoder) Init(headerTableSize uint, dynamicTablesize uint, maxRisk
 	C.lsqpack_enc_init(q.enc, /*SETTINGS_HEADER_TABLE_SIZE*/ C.uint(headerTableSize), C.uint(dynamicTablesize), /*SETTINGS_QPACK_BLOCKED_STREAMS*/ C.uint(maxRiskedStreams), opts)
 }
 func (q *QPackEncoder) StartHeaderBlock(streamID uint64, seqno uint) bool {
-	return C.lsqpack_enc_start_header(q.enc, (C.ulong)(streamID), (C.uint)(seqno)) != 0
+	return C.lsqpack_enc_start_header(q.enc, (C.uint64_t)(streamID), (C.uint)(seqno)) != 0
 }
 func (q *QPackEncoder) Encode(name, value string) ([]byte, []byte) {
 	var enc_sz C.size_t = 1024
@@ -107,8 +107,8 @@ func (q *QPackEncoder) Encode(name, value string) ([]byte, []byte) {
 	value_ptr := C.CString(value)
 
 	ret := C.lsqpack_enc_encode(q.enc,
-		(*C.uchar)(unsafe.Pointer(&enc_buf)), (*C.ulong)(unsafe.Pointer(&enc_sz)),
-		(*C.uchar)(unsafe.Pointer(&header_buf)), (*C.ulong)(unsafe.Pointer(&header_sz)),
+		(*C.uchar)(unsafe.Pointer(&enc_buf)), (*C.size_t)(unsafe.Pointer(&enc_sz)),
+		(*C.uchar)(unsafe.Pointer(&header_buf)), (*C.size_t)(unsafe.Pointer(&header_sz)),
 		(*C.char)(name_ptr), (C.uint)(len(name)),
 		(*C.char)(value_ptr), (C.uint)(len(value)),
 		0)
@@ -127,7 +127,7 @@ func (q *QPackEncoder) EndHeaderBlock() []byte {
 	header_ptr := C.CBytes(header_buf)
 	defer C.free(header_ptr)
 
-	ret := (int)(C.lsqpack_enc_end_header(q.enc, (*C.uchar)(header_ptr), (C.ulong)(len(header_buf))))
+	ret := (int)(C.lsqpack_enc_end_header(q.enc, (*C.uchar)(header_ptr), (C.size_t)(len(header_buf))))
 
 	if ret <= 0 {
 		println("lsqpack_enc_end_header returned error code:", ret)
@@ -141,7 +141,7 @@ func (q *QPackEncoder) DecoderIn(data []byte) bool {
 	data_ptr := C.CBytes(data)
 	defer C.free(data_ptr)
 
-	return C.lsqpack_enc_decoder_in(q.enc, (*C.uchar)(data_ptr), C.ulong(len(data))) != 0
+	return C.lsqpack_enc_decoder_in(q.enc, (*C.uchar)(data_ptr), C.size_t(len(data))) != 0
 }
 
 type QPackDecoder struct {
@@ -162,7 +162,7 @@ func (q *QPackDecoder) HeaderIn(headerBuf []byte, streamID uint64) int {
 	hdr_blk.dec = q.dec
 	hdr_blk.base = header_ptr
 	hdr_blk.orig = header_ptr
-	hdr_blk.orig_sz = (C.ulong)(len(headerBuf))
+	hdr_blk.orig_sz = (C.size_t)(len(headerBuf))
 	hdr_blk.set = (*C.struct_lsqpack_header_set)(C.malloc(C.sizeof_struct_lsqpack_header_set))
 	C.memset(unsafe.Pointer(hdr_blk.set), 0, C.sizeof_struct_lsqpack_header_set)
 
@@ -177,7 +177,7 @@ func (q *QPackDecoder) HeaderIn(headerBuf []byte, streamID uint64) int {
 
 	C.get_ptr_addr(&hdr_blk, &set_ptr, &buf_ptr, &stream_sz_ptr)
 
-	if ret := C.lsqpack_dec_header_in(q.dec, unsafe.Pointer(&hdr_blk), (C.ulong)(streamID), hdr_blk.orig_sz, buf_ptr, C.ulong(len(headerBuf)), set_ptr, (*C.uchar)(hdr_blk.stream), stream_sz_ptr); ret > 1 {
+	if ret := C.lsqpack_dec_header_in(q.dec, unsafe.Pointer(&hdr_blk), (C.uint64_t)(streamID), hdr_blk.orig_sz, buf_ptr, C.size_t(len(headerBuf)), set_ptr, (*C.uchar)(hdr_blk.stream), stream_sz_ptr); ret > 1 {
 		println("lsqpack_dec_header_in returned error code:", ret)
 		q.Error()
 	}
@@ -186,7 +186,7 @@ func (q *QPackDecoder) HeaderIn(headerBuf []byte, streamID uint64) int {
 func (q *QPackDecoder) EncoderIn(in []byte) bool {
 	in_ptr := C.CBytes(in)
 	//defer C.free(in_ptr)
-	return C.lsqpack_dec_enc_in(q.dec, (*C.uchar)(in_ptr), (C.ulong)(len(in))) != 0
+	return C.lsqpack_dec_enc_in(q.dec, (*C.uchar)(in_ptr), (C.size_t)(len(in))) != 0
 }
 func (q *QPackDecoder) Error() {
 	spew.Dump(C.lsqpack_dec_get_err_info(q.dec))
