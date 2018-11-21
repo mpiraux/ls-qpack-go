@@ -1,0 +1,14 @@
+dist: xenial
+language: go
+
+go:
+  - "1.9"
+  - "1.10"
+  - "1.11"
+
+install:
+  - go get -t -v ./... || true
+  - cd $GOPATH/src/github.com/mpiraux/ls-qpack-go && make
+
+script:
+  - go test
