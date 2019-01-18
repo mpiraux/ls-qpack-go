@@ -87,12 +87,12 @@ func NewQPackEncoder(server bool) *QPackEncoder {
 	q := QPackEncoder{
 		enc: (*C.lsqpack_enc_t)(C.malloc(C.sizeof_lsqpack_enc_t)),
 	}
-	C.lsqpack_enc_preinit(q.enc)
+	C.lsqpack_enc_preinit(q.enc, nil)
 	return &q
 }
 func (q *QPackEncoder) Init(headerTableSize uint, dynamicTablesize uint, maxRiskedStreams uint, opts uint32) {
 	opts |= LSQPackEncOptStage2
-	C.lsqpack_enc_init(q.enc, /*SETTINGS_HEADER_TABLE_SIZE*/ C.uint(headerTableSize), C.uint(dynamicTablesize), /*SETTINGS_QPACK_BLOCKED_STREAMS*/ C.uint(maxRiskedStreams), opts)
+	C.lsqpack_enc_init(q.enc, nil, /*SETTINGS_HEADER_TABLE_SIZE*/ C.uint(headerTableSize), C.uint(dynamicTablesize), /*SETTINGS_QPACK_BLOCKED_STREAMS*/ C.uint(maxRiskedStreams), opts, nil, nil)
 }
 func (q *QPackEncoder) StartHeaderBlock(streamID uint64, seqno uint) bool {
 	return C.lsqpack_enc_start_header(q.enc, (C.uint64_t)(streamID), (C.uint)(seqno)) != 0
@@ -153,7 +153,7 @@ func NewQPackDecoder(dynamicTablesize uint, qpackBlockedStreams uint, ) *QPackDe
 	q := QPackDecoder{
 		dec: (*C.lsqpack_dec_t)(C.malloc(C.sizeof_lsqpack_dec_t)),
 	}
-	C.lsqpack_dec_init(q.dec, C.uint(dynamicTablesize), C.uint(qpackBlockedStreams), (*[0]byte)(C.hblock_unblocked))
+	C.lsqpack_dec_init(q.dec, nil, C.uint(dynamicTablesize), C.uint(qpackBlockedStreams), (*[0]byte)(C.hblock_unblocked))
 	return &q
 }
 func (q *QPackDecoder) HeaderIn(headerBuf []byte, streamID uint64) int {

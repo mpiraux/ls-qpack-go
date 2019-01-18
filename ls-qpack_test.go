@@ -55,7 +55,7 @@ func TestBasicEncoder(t *testing.T) {
 
 func TestEncoderStream(t *testing.T) {
 	e := NewQPackEncoder(false)
-	e.Init(4096, 1024, 100, LSQPackEncOptIxAggr)
+	e.Init(4096, 4096, 100, LSQPackEncOptIxAggr)
 
 	headerName := "VeryCommonHeader"
 	headerValue := "42"
@@ -66,7 +66,7 @@ func TestEncoderStream(t *testing.T) {
 
 	spew.Dump(encStream, hb, hdp)
 
-	d := NewQPackDecoder(1024,100)
+	d := NewQPackDecoder(4096,100)
 	if ret := d.HeaderIn(append(hdp, hb...), 4); ret == len(hdp) + len(hb) {
 		t.Fatal("Decoder should be blocked")
 	}
