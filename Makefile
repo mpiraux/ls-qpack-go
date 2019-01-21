@@ -4,6 +4,6 @@ all:
 	git submodule update
 	cd ls-qpack
 	cmake .
-	make
+	make ls-qpack
 	cd ..
 	CGO_LDFLAGS_ALLOW=.*ls-qpack.* go build ls-qpack.go

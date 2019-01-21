@@ -1,7 +1,7 @@
 package ls_qpack_go
 
 /*
-#cgo LDFLAGS: ${SRCDIR}/ls-qpack/libls-qpack.a  ${SRCDIR}/ls-qpack/bin/CMakeFiles/interop-encode.dir/__/deps/xxhash/xxhash.c.o
+#cgo LDFLAGS: ${SRCDIR}/ls-qpack/libls-qpack.a
 #include <stdlib.h>
 #include <string.h>
 #include <sys/uio.h>
