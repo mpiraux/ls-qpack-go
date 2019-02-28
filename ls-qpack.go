@@ -53,7 +53,7 @@ type HeaderBlock struct {
 func (hb *HeaderBlock) Headers() []Header {
 	if hb.headers == nil && hb.hdr_blk.set != nil && hb.hdr_blk.set.qhs_headers != nil {
 		hb.headers = make([]Header, hb.hdr_blk.set.qhs_count)
-		h_slice := (*[1 << 30]*C.struct_lsqpack_header)(unsafe.Pointer(hb.hdr_blk.set.qhs_headers))[:hb.hdr_blk.set.qhs_count:hb.hdr_blk.set.qhs_count] // That's how you convert a C array to a Go slice, son
+		h_slice := (*[1 << 20]*C.struct_lsqpack_header)(unsafe.Pointer(hb.hdr_blk.set.qhs_headers))[:hb.hdr_blk.set.qhs_count:hb.hdr_blk.set.qhs_count] // That's how you convert a C array to a Go slice, son
 		for i, h := range h_slice {
 			hb.headers[i].Name = C.GoStringN(h.qh_name, C.int(h.qh_name_len))
 			hb.headers[i].Value = C.GoStringN(h.qh_value, C.int(h.qh_value_len))
