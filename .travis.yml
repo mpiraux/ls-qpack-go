@@ -1,6 +1,8 @@
-dist: xenial
-language: go
+os:
+  - linux
+  - osx
 
+language: go
 go:
   - "1.9"
   - "1.10"
