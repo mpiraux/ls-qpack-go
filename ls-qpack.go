@@ -5,7 +5,7 @@ package ls_qpack_go
 #include <stdlib.h>
 #include <string.h>
 #include <sys/uio.h>
-#include "ls-qpack/include/lsqpack.h"
+#include "ls-qpack/lsqpack.h"
 
 typedef struct lsqpack_enc lsqpack_enc_t;
 typedef struct lsqpack_dec lsqpack_dec_t;
